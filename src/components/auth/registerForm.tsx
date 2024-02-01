@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { FormError } from '../form-error'
-import { Register } from '../../../actions/register'
+import { register } from '../../../actions/register'
 import { FormSuccess } from '../form.success'
 
 const RegisterForm = () => {
@@ -28,7 +28,7 @@ const RegisterForm = () => {
         setError("")
         setSuccess("")
         startTransition(()=>{
-            Register(values)
+            register(values)
             .then((data)=>{
                 setError(data.error)
                 setSuccess(data.success)

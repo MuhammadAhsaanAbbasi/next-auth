@@ -1,12 +1,30 @@
 "use server"
-
-import { LoginSchema } from "../schemas"
+import bcrypt from "bcryptjs"
+import { RegisterSchema } from "../schemas"
 import * as z from "zod"
+import { db } from "@/lib/db"
+import { getUserByEmail } from "../src/data/user"
 
-export const Register = async (values:z.infer<typeof LoginSchema>)=>{
-    const ValidatePath = LoginSchema.safeParse(values)
-    if(!ValidatePath){
-        return{error:"Invalid Fields "!}
+export const register = async (values: z.infer<typeof RegisterSchema>) => {
+    const validatePath = RegisterSchema.safeParse(values);
+    if(!validatePath.success){
+        return {error:"Invalid Fields"}
     }
-    return {success: "Login Successfully!"}
+    const {name,email,password} = validatePath.data
+    const hashPassword = await bcrypt.hash(password,10)
+
+    const existingUser = await getUserByEmail(email)
+
+    if(existingUser){
+        return {error: "Email Already Exist"}
+    }
+
+    await db.user.create({
+        data:{
+            name,
+            email,
+            password: hashPassword
+        }
+    })
+    return {success: "You are Registerd"}
 }
